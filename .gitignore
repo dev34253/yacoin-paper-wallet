@@ -1,0 +1,4 @@
+node_modules/
+# Upstream YACoin source, cloned only for reference
+src/
+.playwright-mcp/
