@@ -4,7 +4,10 @@ import { $, esc, qrSvg, LOGO, selfTest } from './common.js';
 // ---------- Extra entropy from pointer movement ----------
 // A sample only counts once the pointer has moved a few pixels, so the bar
 // tracks real movement rather than event rate.
-const ENTROPY_SAMPLES = 1000, MIN_MOVE = 4;
+// 628 samples sits halfway between the original 256 and a later 1000, chosen
+// for fill time. The keys' security comes from crypto.getRandomValues; this
+// pool is only extra mixing, so the bar is a UX cue, not a safety threshold.
+const ENTROPY_SAMPLES = 628, MIN_MOVE = 4;
 let pool = [], lastX = -99, lastY = -99;
 addEventListener('pointermove', (e) => {
   if (Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY) < MIN_MOVE) return;
@@ -14,6 +17,11 @@ addEventListener('pointermove', (e) => {
   $('#entropy-bar').style.width = pct + '%';
   $('#entropy-pct').textContent = pct + '%';
 }, { passive: true });
+
+function resetPool() {
+  pool = [];
+  $('#entropy-bar').style.width = '0%'; $('#entropy-pct').textContent = '0%';
+}
 
 function extraEntropy() {
   const typed = new TextEncoder().encode($('#extra-entropy').value);
@@ -78,8 +86,7 @@ $('#gen-btn').addEventListener('click', () => {
     const salt = new Uint8Array(ent.length + 4); salt.set(ent); new DataView(salt.buffer).setUint32(ent.length, i);
     wallets.push(Y.generateWallet(true, salt));
   }
-  pool = [];
-  $('#entropy-bar').style.width = '0%'; $('#entropy-pct').textContent = '0%';
+  resetPool();
   render(wallets);
   $('#result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
@@ -89,6 +96,8 @@ $('#clear-btn').addEventListener('click', () => {
   $('#wallets').innerHTML = ''; $('#details').innerHTML = '';
   $('#result').hidden = true; $('#print-btn').disabled = true; $('#clear-btn').disabled = true;
   $('#extra-entropy').value = '';
+  $('#show-details').checked = false; document.body.classList.remove('reveal');
+  resetPool();
 });
 
 $('#show-details').addEventListener('change', (e) => document.body.classList.toggle('reveal', e.target.checked));

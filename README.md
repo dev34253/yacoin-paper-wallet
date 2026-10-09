@@ -35,7 +35,7 @@ Only compressed keys are generated. yacoind 1.11.0 accepts uncompressed keys, bu
 ## Verification
 
 - Keys were cross-checked against the official `yacoind` 1.11.0 release, run offline. Generated keys import with `ismine: true` and round-trip through `dumpprivkey`, and keys created by yacoind derive to the same addresses here.
-- On load, each page re-derives 4 keys exported by yacoind (`build/vectors.json`) and disables generation if any mismatch. These are throwaway test keys: **never send coins to them.**
+- On load, each page re-derives 4 keys exported by yacoind (`build/vectors.json`) and disables the generator or verifier if any mismatch. These are throwaway test keys: **never send coins to them.**
 
 ## Building
 

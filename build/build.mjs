@@ -3,6 +3,7 @@
 //   generator.html  the paper wallet generator
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 const read = (f) => readFileSync(new URL(f, import.meta.url), 'utf8');
 const logo = 'data:image/png;base64,' + readFileSync(new URL('logo-256.png', import.meta.url)).toString('base64');
@@ -14,21 +15,19 @@ const PAGES = [
 ];
 
 for (const p of PAGES) {
-  const r = await build({ entryPoints: [new URL(p.entry, import.meta.url).pathname], bundle: true, minify: true, format: 'iife', write: false, target: 'es2020', legalComments: 'inline' });
+  const r = await build({ entryPoints: [fileURLToPath(new URL(p.entry, import.meta.url))], bundle: true, minify: true, format: 'iife', write: false, target: 'es2020', legalComments: 'inline' });
   const js = r.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-  // Function replacers so `$` sequences in the inserted content are taken literally.
-  const html = read('pages/shell.html')
-    .replace('__TITLE__', () => p.title)
-    .replace('__BODYCLASS__', () => p.bodyClass)
-    .replace('__PAGE__', () => p.page)
-    .replace('__STYLES__', () => read('pages/styles.css'))
-    .replace('__HEADER__', () => read('pages/header.html'))
-    .replace('__MAIN__', () => read(p.main))
-    .replace('__FOOTER__', () => read('pages/footer.html'))
-    .replace('__VECTORS__', () => vectors)
-    .replace('__LOGO__', () => logo)
-    .replace('__BUNDLE__', () => js);
-  if (/__[A-Z]+__/.test(html.replace(js, ''))) throw new Error(p.out + ': unreplaced placeholder');
+  // One pass over the shell only, so placeholder-like text inside the inserted
+  // content (CSS, page markup, the bundle) is never substituted or flagged.
+  const parts = {
+    TITLE: p.title, BODYCLASS: p.bodyClass, PAGE: p.page,
+    STYLES: read('pages/styles.css'), HEADER: read('pages/header.html'), MAIN: read(p.main),
+    FOOTER: read('pages/footer.html'), VECTORS: vectors, LOGO: logo, BUNDLE: js,
+  };
+  const html = read('pages/shell.html').replace(/__([A-Z]+)__/g, (m, k) => {
+    if (!(k in parts)) throw new Error(`${p.out}: unknown placeholder ${m}`);
+    return parts[k];
+  });
   writeFileSync(new URL('../' + p.out, import.meta.url), html);
   console.log('wrote', p.out, (html.length / 1024).toFixed(0) + ' KB');
 }

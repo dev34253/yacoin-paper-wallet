@@ -34,6 +34,9 @@ function verify() {
     out.innerHTML = `<div class="verdict bad"><b>Not valid.</b> ${esc(e.message)}</div>`;
   }
 }
-$('#verify-input').addEventListener('input', verify);
-
-selfTest();
+if (selfTest()) {
+  $('#verify-input').addEventListener('input', verify);
+} else {
+  $('#verify-input').disabled = true;
+  $('#verify-input').placeholder = 'Disabled: this browser failed the self-test.';
+}

@@ -161,7 +161,6 @@ input[type=number] { max-width: 120px; }
 .verify-grid .qr { width: 160px; height: 160px; border-radius: 8px; margin: 0 auto; display: block; }
 .verify-grid .paper-label { color: var(--text-3); }
 .break { word-break: break-all; font-size: 13px; }
-.verify-actions { margin-top: 20px; text-align: center; }
 
 /* Steps */
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
