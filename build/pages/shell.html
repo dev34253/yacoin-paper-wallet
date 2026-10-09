@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- No network access at all: scripts, styles and images are inline, and nothing may connect out. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>__TITLE__</title>
+<link rel="icon" id="favicon">
+<style>
+__STYLES__</style>
+</head>
+<body class="__BODYCLASS__" data-page="__PAGE__">
+<img id="logo-src" src="__LOGO__" alt="" hidden>
+
+__HEADER__
+__MAIN__
+__FOOTER__
+<script>window.__YAC_VECTORS__ = __VECTORS__;</script>
+<script>__BUNDLE__</script>
+</body>
+</html>
